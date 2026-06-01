@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code session state (not project content)
+.claude/
+
+# Project-specific
+# Raw dataset: re-downloadable from UCI (see README)
+data/raw/
+
+# Processed sliding-window caches: large (~50MB each) and regenerable
+data/processed/*.npz
+
+# Test predictions dump: large (~13MB) and regenerable
+results/test_predictions.npz
+
+# Runtime logs: noisy, contain absolute paths
+logs/
+
+# LaTeX build artifacts (only the .tex / .png / .csv outputs are tracked)
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.nav
+report/*.snm
+report/*.vrb
+report/*.synctex.gz
+report/*.fdb_latexmk
+report/*.fls
