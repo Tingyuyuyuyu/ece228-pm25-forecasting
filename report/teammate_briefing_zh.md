@@ -246,52 +246,70 @@ Transformer 約 40 秒。
 
 ---
 
-## 12. 七張投影片每張要講什麼（300 秒總長度）
+## 12. 三張投影片每張要講什麼（180 秒、每張約 60 秒）
 
-### Slide 1：Title (~5 秒)
-打招呼，自我介紹（team 17、UCSD、ECE 228）。
+> **重要：** 投影片改成「3 頁」版本（因為大家都做 3 頁）。
+> 每張約 60 秒、~150 個英文字，節奏比 7 頁版本更從容。
+> 一定要練一次計時，目標 2:50，留 buffer。
 
-### Slide 2：Why forecast PM2.5? (~30 秒)
-重點講：
-- PM2.5 對健康有害，是大都市空污主角
-- 75 μg/m³ 是 unhealthy 門檻
-- 我們想回答兩個問題：時序模型有用嗎？空間上下文有用嗎？
-- 資料來源是 UCI 北京多測站
+### Slide 1：問題 + 設定（60 秒）
+**畫面結構**：標題 banner + 左右兩欄。
+**左欄**：Why PM2.5 + 兩個研究問題 + 兩種 input setting + spike-recall 定義。
+**右欄**：資料集（12 站 × 4 年）+ task（24h window、h=1/6）+ time-based split 表格 + 預處理 + 7 個模型一段帶過。
 
-### Slide 3：Setup (~30 秒)
-重點講：
-- 24 小時輸入視窗，預測 1h 或 6h 之後的 PM2.5
-- 時間切分（不能隨機切）
-- 標準化 + 裁剪到 ±8σ（順便提一下這修了 GRU 的 NaN 問題）
-- 兩個 setting：global（自己） vs multi（自己 + 其他 11 站平均）
-- Spike-recall 是我們最在乎的指標
+**講稿節錄**：
+- 自我介紹（Team 17、Ting-Yu + Yun-Chen）
+- PM2.5 是什麼、為什麼重要、75 μg/m³ 是 unhealthy 門檻
+- 我們要回答的兩個問題
+- 24 小時輸入視窗、預測 1h 和 6h 後
+- 簡單帶過時間切分（防止洩漏）
+- 兩種 setting：global vs multi-site
+- 三家族 7 個模型，**同樣的資料、同樣的 loss、同樣的 metrics**
 
-### Slide 4：Seven models (~25 秒)
-快速念出三個家族：
-- 無學習的 persistence baseline
-- 三個特徵式模型：Ridge、RF、GBM（把 24×F 攤平）
-- 三個序列模型：LSTM、GRU、Transformer（吃整個視窗）
-- 強調「所有模型用同樣的資料、同樣的 loss、同樣的 metrics」=> 公平比較
+**重點記住**：投影片資訊密，**不要逐字念**，挑要點講。聽眾自己會看。
 
-### Slide 5：Result 1 (~45 秒)
-看 MAE 長條圖：
-- 1 小時：sequence models（GRU/Transformer）最好，MAE ≈ 9.4
-- 6 小時：所有模型 MAE 都跳到 ~30，但 GRU multi-site 還是第一（28.75）
-- Spike-recall：1h 約 95%，6h 約 82–86%
-- 結論：時序模型搭配空間特徵時效果最好
+### Slide 2：主要結果（60 秒）
+**畫面結構**：大張 MAE 長條圖（左 62%）+ 數字與 take-away（右 36%）。
 
-### Slide 6：Result 2 (~35 秒)
-看 Δ 表 + 時序圖：
-- 用「其他 11 站平均」這麼簡單的特徵就有用
-- 所有模型都受益，h=6 受益更大（GRU 降 2.55、LSTM 降 3.92）
-- 右邊的時序圖：GRU multi-site h=1 在奧體中心測站的前三週測試集，
-  幾乎完全貼著實際曲線、抓到了所有 spike
+**講稿節錄**：
+- 介紹圖：「綠色和紅色 = multi-site，藍色和橘色 = global」
+- 1 小時：
+  - Persistence R² 已經 0.95（很強的 baseline）
+  - **Transformer multi-site MAE = 9.41**、**GRU multi-site MAE = 9.51**
+  - Spike-recall ≈ 95%（每 20 個爆表時段抓到 19 個）
+- 6 小時：
+  - Persistence 崩到 R² = 0.56（任務真的變難）
+  - **GRU multi-site MAE = 28.75** 略勝 GBM multi-site 29.00
+- Take-away：**sequence models 搭配 multi-site context 時最有用**
 
-### Slide 7：Wrap-up (~15 秒)
-- 最佳結果：GRU multi-site 兩個 horizon 都最好
-- 一個極簡單的 spatial mean 就帶來持續性的提升
-- 下一步：風向感知的空間聚合、6h 的 LR 重新調、多任務（PM10、NO₂）
-- 「Thanks - questions?」
+### Slide 3：Multi-site 分析 + 收尾（60 秒）
+**畫面結構**：Δ 表（左 39%）+ 時序圖 + 結論（右 59%）。
+
+**講稿節錄**：
+- 介紹 multi-site：「就是把其他 11 站的 channel-wise mean 加進去，
+  沒有 graph、沒有 attention，最簡單的空間摘要」
+- Δ 表：**所有模型、所有 horizon 都受益**；h=6 受益更大
+  - GRU h=6 降 2.55 μg/m³
+  - Ridge h=6 降 1.87
+- 時序圖：GRU multi-site h=1 在奧體中心 3 週測試集，
+  完全貼著實際曲線、抓到所有 spike
+- 收尾：
+  - 最佳：GRU multi-site 兩個 horizon 都贏
+  - Future work：風向感知聚合、h=6 調 LR/patience、multi-task
+- 「Thanks – questions?」（**講完再按下一張**，不要邊念邊翻）
+
+---
+
+### 三個時間點 check（練習時要計時）
+
+| 投影片切換 | 該到的時間 |
+|------------|-----------:|
+| 切到 slide 2 | 約 1:00 |
+| 切到 slide 3 | 約 2:00 |
+| 結束 | 約 3:00 |
+
+如果第 1 張超時，可以把「preprocessing 那段」整段拿掉。
+如果第 2 張超時，數字講「around 9.4」、「around 29」就好，不要每位數念。
 
 ---
 

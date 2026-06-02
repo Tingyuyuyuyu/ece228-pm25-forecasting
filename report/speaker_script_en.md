@@ -1,127 +1,93 @@
-# Speaker Script - 3-minute presentation
+# Speaker Script - 3-minute presentation (3-slide version)
 
-Target total: 180 seconds. Speak at a conversational pace (~150 words/min).
-The full body is ~450 words. Pause briefly between slides; don't rush.
+Target total: 180 seconds across 3 slides. About 60 seconds per slide,
+roughly 150 words spoken per slide at a comfortable pace.
 
-Words in `*italics*` are optional / add if you have time, drop if you're behind.
+Words in `*italics*` are optional / drop if you're behind.
 
 ---
 
-## Slide 1 - Title (5 sec)
+## Slide 1 - Problem + setup (60 sec, ~150 words)
 
-> Hi everyone, we're Team 17. I'm [name], and this is our project on
-> short-term PM2.5 forecasting using the Beijing Multi-Site Air Quality
+> Hi everyone, we're Team 17 -- Ting-Yu and Yun-Chen -- and our project
+> is short-term PM2.5 forecasting on the Beijing Multi-Site Air Quality
 > dataset.
+>
+> PM2.5 is fine particulate matter, the main driver of haze in dense
+> cities. Seventy-five micrograms per cubic meter is the WHO and Chinese
+> national-standard threshold for "unhealthy" air -- the level where
+> cities issue advisories. If we can forecast a few hours ahead, those
+> advisories can go out *before* a spike hits.
+>
+> We set out to answer two questions: first, do sequence models beat
+> simple feature-based regressors here, and second, does pulling in data
+> from the *other* eleven stations help.
+>
+> The data is hourly readings from twelve Beijing monitoring stations
+> over four years. We use a 24-hour input window to predict PM2.5 one
+> hour and six hours ahead, with a strict time-based train-val-test
+> split. *We standardize on train only and clip to plus-or-minus eight
+> sigma -- that one fix solved a rainfall-outlier issue that was causing
+> NaN losses in the GRU.*
+>
+> We compare seven models across three families: persistence as a
+> no-learning baseline; ridge, random forest, and gradient boosting as
+> feature-based baselines; and LSTM, GRU, and a Transformer encoder as
+> sequence models. Same data, same loss, same metrics across all seven.
 
-*[Click to next slide]*
+*[Click to slide 2]*
 
 ---
 
-## Slide 2 - Why forecast PM2.5? (30 sec, ~75 words)
+## Slide 2 - Headline results (60 sec, ~140 words)
 
-> PM2.5 is fine particulate matter -- the main driver of haze in dense
-> cities. It's small enough to reach deep into the lungs, and it's linked
-> to both respiratory and cardiovascular disease. Seventy-five micrograms
-> per cubic meter is the WHO and Chinese national-standard "unhealthy"
-> threshold. If we can forecast a few hours ahead, cities can issue
-> advisories *before* a haze episode hits.
+> Here's the headline. This is test MAE for every model, in both input
+> settings, at both horizons. Green and red bars are multi-site; blue
+> and orange are global.
 >
-> We set out to answer two questions: first, do sequence models actually
-> beat simple feature-based regressors here? And second, does pulling in
-> data from the *other* eleven stations help?
+> At one hour ahead, persistence is already a strong baseline -- R-squared
+> around point-nine-five. But Transformer multi-site reaches MAE of
+> nine-point-four-one, and GRU multi-site is nine-point-five-one. Both
+> edge past every baseline. Spike-recall stays around ninety-five percent
+> -- meaning we flag nineteen out of every twenty unhealthy hours.
+>
+> At six hours ahead, the picture changes. Persistence collapses to
+> R-squared around point-five-six -- the problem is much harder. And the
+> gap between methods opens up. *GRU multi-site reaches MAE of
+> twenty-eight-point-seven-five, just edging out gradient boosting
+> multi-site at twenty-nine-point-zero-zero.*
+>
+> The take-away is that sequence models pay off most when they're paired
+> with the multi-site spatial context. *You can see LSTM struggling at
+> both horizons -- that's a learning-rate and patience tuning issue at
+> our default settings, not a model-family issue.*
 
-*[Click to next slide]*
+*[Click to slide 3]*
 
 ---
 
-## Slide 3 - Setup (30 sec, ~80 words)
+## Slide 3 - Multi-site result + wrap-up (60 sec, ~145 words)
 
-> Our setup is a sliding 24-hour window of pollutant and weather
-> measurements; we predict PM2.5 one hour or six hours ahead. We use a
-> strict time-based split -- train on 2013 through 2015, validate on the
-> first half of 2016, test on the rest.
+> Our second result is about the multi-site setting itself. We just
+> feed in the channel-wise mean of the other eleven stations -- no
+> graph, no attention, the simplest possible spatial summary.
 >
-> We standardize using train-set statistics only, and we clip features
-> at plus-or-minus eight sigma -- that one fix solved an early problem
-> where rainfall outliers were causing NaN losses in the GRU.
->
-> The two input settings: *global* is one model across all twelve
-> stations, each example seeing only its own station's history; the
-> *multi-site* setting adds the channel-wise mean of the other eleven
-> stations at every timestep. We mask the target station out to avoid
-> leakage. Our headline metric is spike-recall: of all the unhealthy
-> hours in the test set, how many did the model also flag.
-
-*[Click to next slide]*
-
----
-
-## Slide 4 - Models (25 sec, ~60 words)
-
-> We compared seven models in three families. A persistence baseline
-> that just predicts y at t-plus-h equals y at t -- surprisingly tough
-> to beat at short horizons. Three feature-based baselines: Ridge
-> regression, Random Forest, and Gradient Boosting, all on the flattened
-> twenty-four-by-F window. And three sequence models: LSTM, GRU, and a
-> small Transformer encoder, each with an eight-dimensional station
-> embedding.
->
-> Same data, same loss, same metrics across everything -- so the
-> comparison is apples to apples.
-
-*[Click to next slide]*
-
----
-
-## Slide 5 - Result 1 (45 sec, ~110 words)
-
-> Here's the headline result. At one hour ahead, persistence is already
-> a strong baseline -- R-squared around point-nine-five. But the
-> sequence models with multi-site context push MAE down to about
-> nine-point-four. *Transformer multi-site is 9.41, GRU multi-site is
-> 9.51.* Spike-recall stays around ninety-five percent -- meaning if a
-> PM2.5 reading is about to cross the unhealthy threshold, we flag it
-> nineteen times out of twenty.
->
-> At six hours ahead, persistence collapses to R-squared point-five-six.
-> *Every* model jumps to MAE around 30. The best single model here is
-> GRU multi-site at 28.75, narrowly beating gradient boosting at 29.00.
-> LSTM struggles -- that's a learning-rate and patience tuning issue at
-> the longer horizon, not an architecture issue.
->
-> The take-away: sequence models pay off most when they're paired with
-> the multi-site context.
-
-*[Click to next slide]*
-
----
-
-## Slide 6 - Result 2 (35 sec, ~90 words)
-
-> Our second result is about the multi-site setting itself. We fed in
-> the channel-wise mean of the other eleven stations -- the simplest
-> possible spatial summary. No graph, no attention.
->
-> The MAE delta is *negative for every model at every horizon* -- meaning
-> multi-site is consistently better than global. And the gains are
-> *larger* at six hours ahead: GRU drops 2.55 micrograms per cubic meter,
-> LSTM drops almost 4. That makes sense -- the further out you predict,
-> the less your own station's recent history alone can tell you.
+> The MAE delta is negative for *every* model at *every* horizon --
+> multi-site is consistently better. And the gains are *larger* at six
+> hours ahead: GRU drops two-point-five-five micrograms per cubic meter,
+> ridge drops one-point-eight-seven. That makes sense -- the further
+> out you predict, the less your own station's recent history alone
+> can tell you.
 >
 > On the right, you can see GRU multi-site one-hour predictions tracking
-> the actual PM2.5 curve at Aotizhongxin station -- it catches the
-> daily cycle and even the spikes above the unhealthy threshold.
-
-*[Click to next slide]*
-
----
-
-## Slide 7 - Wrap-up (15 sec, ~40 words)
-
-> To wrap up: GRU multi-site is our best model at both horizons. A
-> trivial spatial mean already gives a consistent boost. *Next steps:
-> a wind-direction-aware aggregator, proper LR tuning for the six-hour
-> horizon, and multi-task forecasting across all six pollutants.*
+> the actual PM2.5 curve at Aotizhongxin station for three weeks of test
+> data. It catches both the daily cycle and the multi-day haze episodes
+> that cross the unhealthy threshold.
+>
+> To wrap up: GRU with multi-site context is our best model at both
+> horizons. A trivial spatial mean already helps -- the next natural
+> step is a wind-direction-aware aggregator, because upwind stations
+> matter more than downwind ones.
 >
 > Thanks -- happy to take questions.
 
@@ -131,35 +97,44 @@ Words in `*italics*` are optional / add if you have time, drop if you're behind.
 
 | Slide | Target | Cumulative |
 |-------|--------|-----------:|
-| 1     | 5s     | 0:05 |
-| 2     | 30s    | 0:35 |
-| 3     | 30s    | 1:05 |
-| 4     | 25s    | 1:30 |
-| 5     | 45s    | 2:15 |
-| 6     | 35s    | 2:50 |
-| 7     | 15s    | 3:05 |
+| 1     | 60s    | 1:00 |
+| 2     | 60s    | 2:00 |
+| 3     | 60s    | 3:00 |
 
-If you're running short on time during practice, the safest things to
-cut are:
-- *italicized* lines (marked above)
-- Detailed numbers on slide 5 (just say "around 9.4" instead of "9.41")
-- The "twenty-four-by-F window" detail on slide 4
+If you're running short, the safest cuts (in order):
+1. The *italicized* sentences (marked above)
+2. The specific number on slide 2 ("GRU multi-site reaches 28.75")
+   → just say "GRU multi-site barely edges out gradient boosting"
+3. The preprocessing aside on slide 1
 
-If you're running long, you can drop the *italicized* sentences on the fly.
+If you're running long, you can drop one italicized line per slide on
+the fly without losing the argument.
 
 ---
 
 ## Delivery tips
 
-1. **Pace** - 3 minutes is tight. Practice once with a stopwatch; aim
-   for 2:50 so you have buffer for a slow start or a stumble.
-2. **Pause** - half a second between slides reads as confident, not slow.
-3. **Numbers** - drill the four key numbers so they come out smoothly:
-   - 9.41 (best 1h MAE)
-   - 28.75 (best 6h MAE)
-   - 95% (spike-recall at h=1)
-   - 2.55 (multi-site gain on GRU at h=6)
-4. **The MAE chart on slide 5** is the visual centerpiece. Point at the
-   short green and red bars when you mention GRU multi-site.
-5. **End strong** - finish with "Thanks - happy to take questions"
-   *before* the slide changes, then click. Don't read off the slide.
+1. **Pace** - 1 minute per slide feels generous, but practice once with
+   a stopwatch. Aim for 2:50 so you have buffer.
+2. **Don't read the slide** - point at it (the MAE chart on slide 2,
+   the timeseries on slide 3) and *narrate* what's there. The audience
+   can read the bullets themselves.
+3. **The four numbers to drill**:
+   - **9.41** (best 1-hour MAE: Transformer multi-site)
+   - **28.75** (best 6-hour MAE: GRU multi-site)
+   - **95%** (spike-recall at h=1)
+   - **2.55** (GRU MAE drop from multi-site at h=6)
+4. **End strong**: finish "Thanks -- happy to take questions" *before*
+   clicking past. Make eye contact.
+5. **If you stumble on a number**, just say "around nine point four" or
+   "around twenty-nine" -- nobody is checking decimals in real time.
+
+---
+
+## Mapping slide content to talking points
+
+| Slide | Visual centerpiece | Key things to say |
+|-------|--------------------|-------------------|
+| 1 | Text-only, table of splits | Why this problem; two questions; what's in a window; seven models |
+| 2 | MAE bar chart | h=1 numbers, h=6 numbers, sequence + multi-site wins |
+| 3 | Delta table + timeseries plot | Multi-site helps every model, helps more at h=6; show the spike-tracking; future work |
