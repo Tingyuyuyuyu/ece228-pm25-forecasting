@@ -27,78 +27,66 @@
 \begin{document}
 
 \begin{frame}{Short-term PM2.5 Forecasting on the Beijing Multi-Site Dataset}
-\vspace{-0.3em}
+\vspace{-0.5em}
 \centering\footnotesize
 \textbf{Ting-Yu Yu} \quad \textbf{Yun-Chen Tsai} \quad $\cdot$ \quad ECE 228 Team 17, UCSD \quad $\cdot$ \quad Spring 2026
 
-\vspace{0.4em}
+\vspace{0.6em}
 \begin{columns}[T,onlytextwidth]
 % --- left column ---
 \begin{column}{0.48\linewidth}
 \small
-\textbf{Why PM2.5?} Fine particulate matter, deep-lung
-penetrating, linked to respiratory and cardiovascular disease.
-\alert{$\geq 75\,\mu g/m^3$} is the WHO / Chinese GB ``unhealthy''
-threshold -- the level at which cities issue advisories.
+\textbf{Why PM2.5?}\\
+Fine particulate matter, deep-lung penetrating, linked to
+respiratory and cardiovascular disease.
+\alert{$\geq 75\,\mu g/m^3$} is the WHO / Chinese GB
+``unhealthy'' threshold -- the level at which cities issue advisories.
 
-\vspace{0.4em}
-\textbf{Two questions:}
-\begin{enumerate}\setlength\itemsep{0.05em}
+\vspace{0.8em}
+\textbf{Two questions we set out to answer:}
+\begin{enumerate}\setlength\itemsep{0.15em}
   \item Do \alert{sequence models} (LSTM / GRU / Transformer)
         beat feature-based regressors here?
   \item Does \alert{context from the other 11 stations} help?
 \end{enumerate}
 
-\vspace{0.4em}
-\textbf{Two input settings}
-\begin{itemize}\setlength\itemsep{0.05em}
-  \item \alert{global} -- target station's own 24 h history;
-        $F{=}19$ features per timestep.
-  \item \alert{multi-site} -- same, plus the channel-wise
-        \emph{mean of the other 11 stations} (target masked
-        out, no leakage); $F{=}38$.
+\vspace{0.8em}
+\textbf{Two input settings (our main ablation):}
+\begin{itemize}\setlength\itemsep{0.15em}
+  \item \alert{global} -- target station's own 24 h history\\
+        ($F{=}19$ features per timestep)
+  \item \alert{multi-site} -- same, plus channel-wise mean of
+        the \emph{other 11 stations} (target masked out)\\
+        ($F{=}38$ features per timestep)
 \end{itemize}
-
-\vspace{0.4em}
-\textbf{Metric we care about most:} \alert{spike-recall}
-$=$ fraction of test hours with $y \geq 75$ where we also predict $\geq 75$.
 \end{column}
 % --- right column ---
 \begin{column}{0.5\linewidth}
 \small
-\textbf{Data.} UCI Beijing Multi-Site Air Quality:
+\textbf{Data.}\\
+UCI Beijing Multi-Site Air Quality:\\
 \textbf{12 stations} $\times$ \textbf{hourly} $\times$ \textbf{4 years}
-(2013-03 to 2017-02); 6 pollutants + 6 weather variables.
+(2013-03 to 2017-02);\\
+6 pollutants + 6 weather variables.
 
-\vspace{0.4em}
-\textbf{Task.} Sliding window of \alert{24 past hours}
-$\Rightarrow$ predict PM2.5 at $t{+}h$ for $h \in \{1, 6\}$ hours.
+\vspace{0.6em}
+\textbf{Task.}\\
+Sliding window of \alert{24 past hours}
+$\Rightarrow$ predict PM2.5 at $t{+}h$ for $h \in \{1, 6\}$ hours.\\
+Time-based train / val / test split (no leakage).
 
-\vspace{0.4em}
-\textbf{Time-based split} (no leakage):
-\begin{tabular}{lll}
-\toprule
-Train & 2013-03 -- 2015-12 & ($\sim$25k h / station) \\
-Val   & 2016-01 -- 2016-06 & ($\sim$4.4k h / station) \\
-Test  & 2016-07 -- 2017-02 & ($\sim$5.8k h / station) \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.4em}
-\textbf{Preprocessing.} Standardize on train only; clip to
-$\pm 8\sigma$ (rainfall outliers were causing GRU NaN losses).
-Cyclic $(\sin,\cos)$ for wind, hour, day, month.
-
-\vspace{0.4em}
+\vspace{0.6em}
 \textbf{Seven models, one pipeline:}
-\begin{itemize}\setlength\itemsep{0.05em}
-  \item \textit{No-learning}: Persistence $\hat y_{t+h}{=}y_t$
-  \item \textit{Feature-based}: Ridge, Random Forest, Gradient Boosting
-  \item \textit{Sequence}: LSTM, GRU, Transformer encoder
-        (2 layers, hidden 128, station embedding)
+\begin{itemize}\setlength\itemsep{0.15em}
+  \item \textit{No-learning}\,: Persistence $\hat y_{t+h}{=}y_t$
+  \item \textit{Feature-based}\,: Ridge, Random Forest, GBM
+  \item \textit{Sequence}\,: LSTM, GRU, Transformer encoder
 \end{itemize}
-Training: AdamW, smooth-$L_1$ loss, early stop on val MAE,
-PyTorch MPS backend.
+
+\vspace{0.6em}
+\textbf{Metric we care most about:}\\
+\alert{spike-recall} $=$ fraction of unhealthy hours
+($y \geq 75\,\mu g/m^3$) where we also predict $\geq 75$.
 \end{column}
 \end{columns}
 \end{frame}

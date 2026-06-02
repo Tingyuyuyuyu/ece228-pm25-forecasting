@@ -254,17 +254,23 @@ Transformer 約 40 秒。
 
 ### Slide 1：問題 + 設定（60 秒）
 **畫面結構**：標題 banner + 左右兩欄。
-**左欄**：Why PM2.5 + 兩個研究問題 + 兩種 input setting + spike-recall 定義。
-**右欄**：資料集（12 站 × 4 年）+ task（24h window、h=1/6）+ time-based split 表格 + 預處理 + 7 個模型一段帶過。
+**左欄**：Why PM2.5 + 兩個研究問題 + 兩種 input setting（這頁最重要的 ablation）。
+**右欄**：資料集（12 站 × 4 年）+ task（24h window、h=1/6、time-based split 一句帶過）+ 7 個模型 3 行帶過 + spike-recall 定義。
 
 **講稿節錄**：
 - 自我介紹（Team 17、Ting-Yu + Yun-Chen）
 - PM2.5 是什麼、為什麼重要、75 μg/m³ 是 unhealthy 門檻
 - 我們要回答的兩個問題
-- 24 小時輸入視窗、預測 1h 和 6h 後
-- 簡單帶過時間切分（防止洩漏）
-- 兩種 setting：global vs multi-site
-- 三家族 7 個模型，**同樣的資料、同樣的 loss、同樣的 metrics**
+- 兩種 setting：global vs multi-site（**重點：這就是我們的對照組**）
+- 資料 12 站 × 4 年 × 每小時、6 污染物 + 6 氣象
+- 24 小時輸入視窗、預測 1h 和 6h 後（不需要逐字念 split 細節）
+- 三家族 7 個模型一句話帶過：「persistence、3 個特徵式、3 個序列」
+- 提一下我們最在乎的是 spike-recall（會發警報的時段抓到多少）
+
+**已從投影片拿掉的細節**（如果有時間還是可以口頭補一句）：
+- 預處理：clip ±8σ、cyclic encoding（細節，講不到沒關係）
+- 訓練：AdamW、smooth-L1 loss、MPS backend（被問到再講）
+- Split 三個日期區間（如果被問詳細日期，就答 2013-2015 train、2016 H1 val、2016 H2+ test）
 
 **重點記住**：投影片資訊密，**不要逐字念**，挑要點講。聽眾自己會看。
 
