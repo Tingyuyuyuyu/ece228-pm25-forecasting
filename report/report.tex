@@ -2,14 +2,22 @@
 % Beijing PM2.5 forecasting
 %
 % Build with:  pdflatex report.tex  (twice, for references)
+% Requires:  neurips_2026.sty in the same directory.
 % Tables in tables/ get auto-filled by `python -m src.make_latex_tables`
 % after running src.run_experiments.
+%
+% Template option:
+%   [preprint]      -> clean preprint style, "Preprint." in footer
+%   [final, main]   -> camera-ready style with NeurIPS conference notice
+%   (no option)     -> anonymous submission style with line numbers
+% Class projects usually want [preprint]; switch the line below.
 
-\documentclass[11pt]{article}
+\documentclass{article}
 
-\usepackage[margin=1in]{geometry}
+\usepackage[preprint]{neurips_2026}
+
+% Packages the NeurIPS template does NOT load itself
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{amsmath}
@@ -17,6 +25,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
+\usepackage{url}
 
 \hypersetup{colorlinks=true, linkcolor=blue!50!black,
             citecolor=blue!50!black, urlcolor=blue!60!black}
@@ -24,8 +33,20 @@
 \graphicspath{{figures/}}
 
 \title{Short-term PM2.5 Forecasting on the Beijing\\Multi-Site Air Quality Dataset}
-\author{Ting-Yu Yu \quad Yun-Chen Tsai\\\small ECE 228, Team 17}
-\date{Spring 2026}
+
+% NeurIPS author block: name / affiliation / address / email per author,
+% joined with \And (or \AND for a hard line-break between groups).
+\author{%
+  Ting-Yu Yu\\
+  ECE 228, Team 17\\
+  UC San Diego\\
+  \texttt{tiy035@ucsd.edu}\\
+  \And
+  Yun-Chen Tsai\\
+  ECE 228, Team 17\\
+  UC San Diego\\
+  \texttt{yut037@ucsd.edu}\\
+}
 
 \begin{document}
 \maketitle
